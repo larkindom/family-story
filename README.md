@@ -14,10 +14,10 @@ Family Story is designed to be lighter than that: no login, no app install, one 
 
 This is a curated showcase, not the full source. It includes:
 
-- **A clickable UX demo** (this page) — the actual narrator recording flow and the organizer dashboard, fully interactive, no backend required.
-- **Screenshots** of the working prototype below, which has a real backend, a real database, and real microphone recording.
+- **A clickable UX demo** (this page) — a static HTML/CSS/JS mockup of the narrator recording flow and the organizer dashboard, fully interactive, no backend required.
+- **Screenshots** of the actual working prototype below, which is a real app: React, Vite, Tailwind, and shadcn/ui on the frontend, with a Node/Express backend, a real database, and real microphone recording.
 
-It does not include the working prototype's backend, data model, or the planned AI pipeline design — those stay private.
+It does not include the working prototype's source, backend, data model, or the planned AI pipeline design — those stay private. That's also why this repo shows up as 100% HTML on GitHub: the demo page here is a hand-built visual stand-in, not the real React app.
 
 ## Screenshots
 
