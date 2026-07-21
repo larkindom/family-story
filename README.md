@@ -29,7 +29,7 @@ It does not include the working prototype's backend, data model, or the planned 
 
 ![Narrator confirmation screen](screenshots/narrator-done.png)
 
-**Managing the family** — adding people, tracking who's answered what, browsing the archive
+**Managing the family** — a sidebar for the people being recorded, with each person's own question queue and archive
 
 ![Organizer dashboard](screenshots/organizer-dashboard.png)
 
@@ -40,7 +40,7 @@ It does not include the working prototype's backend, data model, or the planned 
 ## How it works (high level)
 
 - The person telling their story gets **one personal link** — no account, no app. It shows one question, one big record button, nothing else.
-- Whoever's organizing the family (a kid, usually) gets a **dashboard**: add or remove the people being recorded, note how they relate to each other, customize each person's questions, and browse everyone's answers as they come in.
+- Whoever's organizing the family (a kid, usually) gets a **sidebar dashboard**: add or remove the people being recorded, note how they relate to each other, switch between people to see each one's own question queue, and browse everyone's answers as they come in.
 - Each storyteller only ever sees their own questions — the family management layer is invisible to them.
 
 The working version behind these screenshots has real microphone recording, real audio storage, and a real database — none of that is included here.

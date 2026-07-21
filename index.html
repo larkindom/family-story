@@ -392,9 +392,77 @@
 
   /* ---------- Organizer app ---------- */
 
-  .organizer { display: none; width: 100%; max-width: 760px; z-index: 1; padding-bottom: 40px; }
-  .organizer.is-active { display: block; }
+  .organizer {
+    display: none;
+    width: 100%;
+    max-width: 980px;
+    z-index: 1;
+    min-height: 620px;
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / 0.06), 0 20px 40px -20px hsl(var(--shadow) / 0.25);
+  }
+  .organizer.is-active { display: flex; }
   .stage.is-hidden { display: none; }
+
+  .org-sidebar {
+    width: 230px;
+    flex: none;
+    background: var(--sage-soft);
+    border-right: 1px solid var(--panel-edge);
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .org-sidebar-header { padding: 0 6px 14px; }
+  .org-sidebar-sub { font-size: 12px; color: var(--ink-faint); margin: 4px 0 0; }
+  .org-people-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--ink-faint); padding: 0 6px; margin: 10px 0 6px;
+  }
+  .org-people-list { list-style: none; margin: 0 0 4px; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .org-person-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px; border-radius: 10px; cursor: pointer; border: none; background: transparent;
+    width: 100%; text-align: left; font-family: inherit; color: var(--ink); font-size: 14px;
+  }
+  .org-person-item:hover { background: hsl(var(--shadow) / 0.05); }
+  .org-person-item.is-active { background: var(--panel); box-shadow: 0 1px 2px hsl(var(--shadow) / 0.08); font-weight: 600; }
+  .org-avatar {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--moss); color: var(--panel);
+    display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex: none;
+  }
+  .org-person-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .org-person-badge { font-size: 11px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+
+  .org-sidebar-footer { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--panel-edge); display: flex; flex-direction: column; gap: 6px; }
+  .org-side-btn {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    font-family: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink-soft);
+    background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 10px;
+    padding: 9px 10px; cursor: pointer; text-align: left;
+  }
+  .org-side-btn:hover { color: var(--ink); border-color: var(--ink-faint); }
+  .org-side-btn svg { width: 15px; height: 15px; flex: none; }
+
+  .org-reveal { display: none; flex-direction: column; gap: 8px; padding: 6px 2px 2px; }
+  .org-reveal.is-open { display: flex; }
+  .org-reveal input, .org-reveal select {
+    font-family: inherit; font-size: 13px; padding: 8px 9px; border-radius: 8px;
+    border: 1px solid var(--panel-edge); background: var(--bg); color: var(--ink); width: 100%;
+  }
+  .org-reveal .rel-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; background: var(--panel); border-radius: 8px; padding: 6px 8px; font-size: 12.5px; }
+  .org-reveal .rel-row button { border: none; background: none; color: var(--ink-faint); cursor: pointer; font-size: 14px; line-height: 1; }
+  .org-reveal .rel-select-row { display: flex; gap: 6px; }
+  .org-reveal-submit {
+    font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 8px 10px; border-radius: 8px;
+    border: none; background: var(--moss); color: var(--panel); cursor: pointer;
+  }
+
+  .org-main { flex: 1; padding: 28px 30px; min-width: 0; overflow-y: auto; }
 
   .org-header {
     display: flex;
@@ -411,7 +479,7 @@
   @media (min-width: 640px) { .org-grid { grid-template-columns: 1fr 1fr; } }
 
   .panel {
-    background: var(--panel);
+    background: var(--bg);
     border: 1px solid var(--panel-edge);
     border-radius: 20px;
     padding: 22px;
@@ -580,57 +648,67 @@
 
   <!-- Organizer app -->
   <div class="organizer" id="organizerApp">
-    <div class="org-header">
-      <div>
-        <h1 class="org-title display">Mom's Stories</h1>
-        <p class="org-sub">3 of 8 questions answered &middot; last recording 2 days ago</p>
+    <div class="org-sidebar">
+      <div class="org-sidebar-header">
+        <span class="wordmark">
+          <svg class="leaf-mark" viewBox="0 0 24 24"><path d="M20 4c-9 0-16 6-16 15 9 0 16-6 16-15z"/></svg>
+          <strong>Our&nbsp;Family</strong>
+        </span>
+        <p class="org-sidebar-sub" id="familySummary">2 people</p>
+      </div>
+
+      <p class="org-people-label">People</p>
+      <ul class="org-people-list" id="peopleList"></ul>
+
+      <div class="org-sidebar-footer">
+        <button class="org-side-btn" id="addPersonToggle" type="button">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M15 19v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="8.5" cy="7" r="3.5" stroke="currentColor" stroke-width="2"/><path d="M20 8v6M17 11h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Add a person
+        </button>
+        <div class="org-reveal" id="addPersonReveal">
+          <input type="text" id="newPersonName" placeholder="e.g. Dad, Grandma Rose&hellip;" />
+          <button class="org-reveal-submit" id="addPersonBtn" type="button">Add person</button>
+        </div>
+
+        <button class="org-side-btn" id="relationshipsToggle" type="button">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="15" r="3" stroke="currentColor" stroke-width="2"/><path d="M10.5 9.5l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Relationships
+        </button>
+        <div class="org-reveal" id="relationshipsReveal">
+          <div id="relList"></div>
+          <div class="rel-select-row">
+            <select id="relPersonA"></select>
+            <select id="relPersonB"></select>
+          </div>
+          <input type="text" id="relLabel" placeholder="e.g. married to, parent of&hellip;" />
+          <button class="org-reveal-submit" id="addRelBtn" type="button">Add relationship</button>
+        </div>
       </div>
     </div>
 
-    <div class="org-grid">
-      <div class="panel">
-        <h2>Question queue</h2>
-        <ul class="q-list" id="qList">
-          <li class="q-item"><p>What's your earliest childhood memory?</p><span class="chip chip-answered">Answered</span></li>
-          <li class="q-item"><p>Tell me about the house you grew up in.</p><span class="chip chip-answered">Answered</span></li>
-          <li class="q-item"><p>How did you meet Dad?</p><span class="chip chip-answered">Answered</span></li>
-          <li class="q-item"><p>What was your first job like?</p><span class="chip chip-pending">Pending</span></li>
-          <li class="q-item"><p>What's a piece of advice you'd want the grandkids to remember?</p><span class="chip chip-pending">Pending</span></li>
-          <li class="q-item"><p>Tell me about a time you were really scared &mdash; and how you got through it.</p><span class="chip chip-pending">Pending</span></li>
-          <li class="q-item"><p>What does happiness look like to you these days?</p><span class="chip chip-pending">Pending</span></li>
-          <li class="q-item"><p>Is there a story from your life you don't think anyone's ever heard?</p><span class="chip chip-pending">Pending</span></li>
-        </ul>
-        <div class="add-row">
-          <input type="text" id="newQuestion" placeholder="Add a question of your own&hellip;" />
-          <button id="addQuestionBtn" type="button">Add</button>
+    <div class="org-main">
+      <div class="org-header">
+        <div>
+          <h1 class="org-title display" id="orgPersonName">Mom</h1>
+          <p class="org-sub" id="orgFamilySub">0 of 16 questions answered across the family</p>
         </div>
       </div>
 
-      <div class="panel">
-        <h2>Archive</h2>
-        <ul class="rec-list">
-          <li class="rec-item">
-            <button class="play-btn" type="button" aria-label="Play recording"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20" fill="currentColor"/></svg></button>
-            <div class="rec-meta">
-              <p class="rec-q">How did you meet Dad?</p>
-              <p class="rec-date">Jul 19 &middot; 1:42</p>
-            </div>
-          </li>
-          <li class="rec-item">
-            <button class="play-btn" type="button" aria-label="Play recording"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20" fill="currentColor"/></svg></button>
-            <div class="rec-meta">
-              <p class="rec-q">Tell me about the house you grew up in.</p>
-              <p class="rec-date">Jul 17 &middot; 2:05</p>
-            </div>
-          </li>
-          <li class="rec-item">
-            <button class="play-btn" type="button" aria-label="Play recording"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20" fill="currentColor"/></svg></button>
-            <div class="rec-meta">
-              <p class="rec-q">What's your earliest childhood memory?</p>
-              <p class="rec-date">Jul 14 &middot; 0:58</p>
-            </div>
-          </li>
-        </ul>
+      <div class="org-grid">
+        <div class="panel">
+          <h2>Question queue</h2>
+          <ul class="q-list" id="qList"></ul>
+          <div class="add-row">
+            <input type="text" id="newQuestion" placeholder="Add a question of your own&hellip;" />
+            <button id="addQuestionBtn" type="button">Add</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Archive</h2>
+          <ul class="rec-list" id="recList"></ul>
+          <p class="helper" id="emptyArchiveNote" style="display: none;">No recordings yet &mdash; send this link to get started.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -732,24 +810,183 @@
     viewToggle.textContent = inOrganizer ? "← Narrator view" : "Organizer view →";
   });
 
+  // ---------- Organizer: people, relationships, per-person queue/archive ----------
+
+  let people = [
+    {
+      id: 1,
+      name: "Mom",
+      answeredCount: 3,
+      customQuestions: [],
+      recordings: [
+        { q: "How did you meet Dad?", date: "Jul 19", dur: "1:42" },
+        { q: "Tell me about the house you grew up in.", date: "Jul 17", dur: "2:05" },
+        { q: "What's your earliest childhood memory?", date: "Jul 14", dur: "0:58" },
+      ],
+    },
+    { id: 2, name: "Dad", answeredCount: 0, customQuestions: [], recordings: [] },
+  ];
+  let relationships = [{ a: 1, b: 2, label: "married to" }];
+  let nextPersonId = 3;
+  let selectedPersonId = 1;
+
+  function initials(name) {
+    return name.split(" ").map(p => p[0]).slice(0, 2).join("").toUpperCase();
+  }
+  function totalAnswered() {
+    return people.reduce((s, p) => s + p.answeredCount, 0);
+  }
+  function totalQuestions() {
+    return people.reduce((s, p) => s + questions.length + p.customQuestions.length, 0);
+  }
+
+  function renderSidebar() {
+    document.getElementById("familySummary").textContent =
+      people.length + (people.length === 1 ? " person" : " people");
+
+    const list = document.getElementById("peopleList");
+    list.innerHTML = "";
+    people.forEach(p => {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "org-person-item" + (p.id === selectedPersonId ? " is-active" : "");
+      btn.innerHTML =
+        `<span class="org-avatar">${initials(p.name)}</span>` +
+        `<span class="org-person-name"></span>` +
+        `<span class="org-person-badge">${p.answeredCount}/${questions.length + p.customQuestions.length}</span>`;
+      btn.querySelector(".org-person-name").textContent = p.name;
+      btn.addEventListener("click", () => { selectedPersonId = p.id; renderAll(); });
+      li.appendChild(btn);
+      list.appendChild(li);
+    });
+
+    const optsHTML = people.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
+    document.getElementById("relPersonA").innerHTML = optsHTML;
+    document.getElementById("relPersonB").innerHTML = optsHTML;
+
+    const relListEl = document.getElementById("relList");
+    relListEl.innerHTML = "";
+    if (relationships.length === 0) {
+      const p = document.createElement("p");
+      p.className = "helper";
+      p.style.margin = "0";
+      p.textContent = "No relationships added yet.";
+      relListEl.appendChild(p);
+    } else {
+      relationships.forEach((r, idx) => {
+        const a = people.find(p => p.id === r.a);
+        const b = people.find(p => p.id === r.b);
+        if (!a || !b) return;
+        const row = document.createElement("div");
+        row.className = "rel-row";
+        row.innerHTML = `<span><strong></strong> ${r.label} <strong></strong></span><button type="button" aria-label="Remove relationship">&times;</button>`;
+        const strongs = row.querySelectorAll("strong");
+        strongs[0].textContent = a.name;
+        strongs[1].textContent = b.name;
+        row.querySelector("button").addEventListener("click", () => {
+          relationships.splice(idx, 1);
+          renderSidebar();
+        });
+        relListEl.appendChild(row);
+      });
+    }
+  }
+
+  function renderMain() {
+    const person = people.find(p => p.id === selectedPersonId);
+    if (!person) return;
+
+    document.getElementById("orgPersonName").textContent = person.name;
+    document.getElementById("orgFamilySub").textContent =
+      `${totalAnswered()} of ${totalQuestions()} questions answered across the family`;
+
+    const qList = document.getElementById("qList");
+    qList.innerHTML = "";
+    questions.forEach((q, i) => {
+      const li = document.createElement("li");
+      li.className = "q-item";
+      const answered = i < person.answeredCount;
+      li.innerHTML = `<p></p><span class="chip ${answered ? "chip-answered" : "chip-pending"}">${answered ? "Answered" : "Pending"}</span>`;
+      li.querySelector("p").textContent = q;
+      qList.appendChild(li);
+    });
+    person.customQuestions.forEach(q => {
+      const li = document.createElement("li");
+      li.className = "q-item";
+      li.innerHTML = `<p></p><span class="chip chip-pending">Pending</span>`;
+      li.querySelector("p").textContent = q;
+      qList.appendChild(li);
+    });
+
+    const recList = document.getElementById("recList");
+    recList.innerHTML = "";
+    const emptyNote = document.getElementById("emptyArchiveNote");
+    if (person.recordings.length === 0) {
+      emptyNote.style.display = "block";
+    } else {
+      emptyNote.style.display = "none";
+      person.recordings.forEach(r => {
+        const li = document.createElement("li");
+        li.className = "rec-item";
+        li.innerHTML =
+          `<button class="play-btn" type="button" aria-label="Play recording"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20" fill="currentColor"/></svg></button>` +
+          `<div class="rec-meta"><p class="rec-q"></p><p class="rec-date">${r.date} &middot; ${r.dur}</p></div>`;
+        li.querySelector(".rec-q").textContent = r.q;
+        li.querySelector(".play-btn").addEventListener("click", (e) => {
+          e.currentTarget.style.opacity = "0.6";
+          setTimeout(() => { e.currentTarget.style.opacity = "1"; }, 300);
+        });
+        recList.appendChild(li);
+      });
+    }
+  }
+
+  function renderAll() {
+    renderSidebar();
+    renderMain();
+  }
+
+  function setupReveal(toggleId, revealId) {
+    document.getElementById(toggleId).addEventListener("click", () => {
+      document.getElementById(revealId).classList.toggle("is-open");
+    });
+  }
+  setupReveal("addPersonToggle", "addPersonReveal");
+  setupReveal("relationshipsToggle", "relationshipsReveal");
+
+  document.getElementById("addPersonBtn").addEventListener("click", () => {
+    const input = document.getElementById("newPersonName");
+    const name = input.value.trim();
+    if (!name) return;
+    people.push({ id: nextPersonId++, name, answeredCount: 0, customQuestions: [], recordings: [] });
+    input.value = "";
+    document.getElementById("addPersonReveal").classList.remove("is-open");
+    selectedPersonId = people[people.length - 1].id;
+    renderAll();
+  });
+
+  document.getElementById("addRelBtn").addEventListener("click", () => {
+    const a = Number(document.getElementById("relPersonA").value);
+    const b = Number(document.getElementById("relPersonB").value);
+    const label = document.getElementById("relLabel").value.trim();
+    if (!a || !b || a === b || !label) return;
+    relationships.push({ a, b, label });
+    document.getElementById("relLabel").value = "";
+    renderSidebar();
+  });
+
   document.getElementById("addQuestionBtn").addEventListener("click", () => {
     const input = document.getElementById("newQuestion");
     const val = input.value.trim();
     if (!val) return;
-    const li = document.createElement("li");
-    li.className = "q-item";
-    li.innerHTML = '<p></p><span class="chip chip-pending">Pending</span>';
-    li.querySelector("p").textContent = val;
-    document.getElementById("qList").appendChild(li);
+    const person = people.find(p => p.id === selectedPersonId);
+    person.customQuestions.push(val);
     input.value = "";
+    renderAll();
   });
 
-  document.querySelectorAll(".rec-item .play-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      btn.style.opacity = "0.6";
-      setTimeout(() => { btn.style.opacity = "1"; }, 300);
-    });
-  });
+  renderAll();
 </script>
 </body>
 </html>
